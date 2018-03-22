@@ -1,0 +1,9 @@
+CC=mpic++
+
+# CFLAGS will be the options passed to the compiler.
+CFLAGS= -Wall 
+
+LIB =  
+LIBF = -lstdc++
+INC = 
+
