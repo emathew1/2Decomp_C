@@ -30,22 +30,67 @@ int main(int argc, char *argv[]){
     	cout << "-------------------" << endl;
     	cout << endl;
 
-	cout << "attempting C2Decomp" << endl;
     }
  
-    int nx = 50, ny = 50, nz = 50;
+    int nx = 17, ny = 7, nz = 31;
     int pRow = 2, pCol = 2;
     bool periodicBC[3] = {false, false, false};
 
     C2Decomp *c2d;
     c2d = new C2Decomp(nx, ny, nz, pRow, pCol, periodicBC);
-
-    if(!mpiRank){
-	cout << "Probably we blew up didn't we?" << endl;
+    
+    int m = 0;
+    double data1[nz][ny][nx];
+    for(int kp = 0; kp < nz; kp++){
+	for(int jp = 0; jp < ny; jp++){
+	    for(int ip = 0; ip < nx; ip++){
+		data1[kp][jp][ip] = (double)m;
+		m++;
+	    }
+	}
     }
 
+    double xSize[3], ySize[3], zSize[3];
+    xSize[0] = c2d->xSize[0];
+    xSize[1] = c2d->xSize[1];
+    xSize[2] = c2d->xSize[2];
+    ySize[0] = c2d->ySize[0];
+    ySize[1] = c2d->ySize[1];
+    ySize[2] = c2d->ySize[2];
+    zSize[0] = c2d->zSize[0];
+    zSize[1] = c2d->zSize[1];
+    zSize[2] = c2d->zSize[2];
 
-    int i = 3;
+    double *u1, *u2;
+
+
+    c2d->allocX(u1);
+    c2d->allocY(u2);
+
+    for(int kp = 0; kp < xSize[2]; kp++){
+	for(int jp = 0; jp < xSize[1]; jp++){
+	    for(int ip = 0; ip < xSize[0]; ip++){
+		int ii = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
+		u1[ii] = data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip];
+	    }
+	}
+    }
+
+    c2d->transposeX2Y(u1, u2);
+
+  if(!mpiRank){
+    //Testing transposition
+    for(int kp = 0; kp < ySize[2]; kp++){
+	for(int jp = 0; jp < ySize[1]; jp++){
+	    for(int ip = 0; ip < ySize[0]; ip++){
+		int ii = kp*ySize[1]*ySize[0] + jp*ySize[0] + ip;
+		cout << u2[ii] << " " << data1[c2d->yStart[2]+kp][c2d->yStart[1]+jp][c2d->yStart[0]+ip] << endl;;
+	    }
+	}
+    }
+  }
+/*
+    int i = 1;
 	if(mpiRank == i){
 		cout << "Rank " << i << endl;		
 	        cout << c2d->xStart[0] << " " << c2d->xStart[1] << " " << c2d->xStart[2] << endl;
@@ -59,8 +104,28 @@ int main(int argc, char *argv[]){
 	        cout << c2d->zSize[0] << " " << c2d->zSize[1] << " " << c2d->zSize[2] << endl;
 
 	}
+	if(mpiRank == i){
+		cout << endl;
+	}
 
+	if(mpiRank == i){
+	    for(int j = 0; j < c2d->dims[0]; j++){
+		cout << c2d->decompMain.x1cnts[j] << " " << c2d->decompMain.x1disp[j] << endl;
+	    }
+	    cout << endl;
+	    for(int j = 0; j < c2d->dims[0]; j++){
+		cout << c2d->decompMain.y1cnts[j] << " " << c2d->decompMain.y1disp[j] << endl;
+	    }
+	    cout << endl;
 
+	    for(int j = 0; j < c2d->dims[1]; j++){
+		cout << c2d->decompMain.y2dist[j] << " " << c2d->decompMain.z2dist[j] << endl;
+	    }
+	}
+*/
+
+    c2d->deallocXYZ(u1);
+    c2d->deallocXYZ(u2);
 
     //Now lets kill MPI
     MPI_Finalize();

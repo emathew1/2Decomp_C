@@ -63,13 +63,14 @@ void C2Decomp::decomp2DInit(int pRow, int pCol){
 	decompInfoInit();
 
 	for(int i = 0; i < 3; i++){
-	   xStart[i] = decompMain.xst[i];
-	   yStart[i] = decompMain.yst[i];
-	   zStart[i] = decompMain.zst[i];
+	   //minus 1 to get C style zero start indices
+	   xStart[i] = decompMain.xst[i]-1;
+	   yStart[i] = decompMain.yst[i]-1;
+	   zStart[i] = decompMain.zst[i]-1;
 	
-	   xEnd[i]   = decompMain.xen[i];
-	   yEnd[i]   = decompMain.yen[i];
-	   zEnd[i]   = decompMain.zen[i];
+	   xEnd[i]   = decompMain.xen[i]-1;
+	   yEnd[i]   = decompMain.yen[i]-1;
+	   zEnd[i]   = decompMain.zen[i]-1;
 	
 	   xSize[i]  = decompMain.xsz[i];
 	   ySize[i]  = decompMain.ysz[i];
@@ -175,8 +176,8 @@ void C2Decomp::decompInfoInit(){
 	    work2_r = NULL;
 	}
 
-	work1_r = new myType[bufSize];
-	work2_r = new myType[bufSize];
+	work1_r = new double[bufSize];
+	work2_r = new double[bufSize];
     }
 
 };

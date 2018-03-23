@@ -25,7 +25,7 @@ class C2Decomp{
 	int nRank, nProc;
 
 
-    private:
+    public:
 	//parameters for 2D Cartesian Topology
 	int dims[2], coord[2];
 	int periodic[2];
@@ -76,7 +76,7 @@ class C2Decomp{
     private:
 	//These are the buffers used by MPI_ALLTOALL(V) calls
 	int decompBufSize;
-	myType *work1_r, *work2_r; //Only implementing real for now... 
+	double *work1_r, *work2_r; //Only implementing real for now... 
         
 
     public:
@@ -105,34 +105,35 @@ class C2Decomp{
 	void decomp2DFinalize();
 
 	//Just get it running without the optional decomp for now...
-	void transposeX2Y(myType ***src, myType ***dst);
-	void transposeY2Z(myType ***src, myType ***dst);
-	void transposeZ2Y(myType ***src, myType ***dst);
-	void transposeY2X(myType ***src, myType ***dst);
+	void transposeX2Y(double *src, double *dst);
+	void transposeY2Z(double *src, double *dst);
+	void transposeZ2Y(double *src, double *dst);
+	void transposeY2X(double *src, double *dst);
 	
 	//calls for overlapping communication and computation...
-	void transposeX2Y_Start(int handle, myType ***src, myType ***dst, myType ***sbuf, myType ***rbuf);
-	void transposeX2Y_Wait (int handle, myType ***src, myType ***dst, myType ***sbuf, myType ***rbuf);
+	void transposeX2Y_Start(int handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeX2Y_Wait (int handle, double *src, double *dst, double *sbuf, double *rbuf);
 
-	void transposeY2Z_Start(int handle, myType ***src, myType ***dst, myType ***sbuf, myType ***rbuf);
-	void transposeY2Z_Wait (int handle, myType ***src, myType ***dst, myType ***sbuf, myType ***rbuf);
+	void transposeY2Z_Start(int handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeY2Z_Wait (int handle, double *src, double *dst, double *sbuf, double *rbuf);
 
-	void transposeZ2Y_Start(int handle, myType ***src, myType ***dst, myType ***sbuf, myType ***rbuf);
-	void transposeZ2Y_Wait (int handle, myType ***src, myType ***dst, myType ***sbuf, myType ***rbuf);
+	void transposeZ2Y_Start(int handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeZ2Y_Wait (int handle, double *src, double *dst, double *sbuf, double *rbuf);
 	
-	void transposeY2X_Start(int handle, myType ***src, myType ***dst, myType ***sbuf, myType ***rbuf);
-	void transposeY2X_Wait (int handle, myType ***src, myType ***dst, myType ***sbuf, myType ***rbuf);
+	void transposeY2X_Start(int handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeY2X_Wait (int handle, double *src, double *dst, double *sbuf, double *rbuf);
 	
 	void decompInfoInit();
 	void decompInfoFinalize(DecompInfo decompinfo_in);
 
 
 	//only doing real 
-	void allocX(myType ***var); 
-	void allocY(myType ***var); 
-	void allocZ(myType ***var); 
+	void allocX(double *&var); 
+	void allocY(double *&var); 
+	void allocZ(double *&var); 
+	void deallocXYZ(double *&var);
 
-	void updateHalo(myType ***in, myType ***out, int level);
+	void updateHalo(double *in, double *out, int level);
 
 	void decomp2DAbort(int errorCode, string msg);
 	void initNeighbor();	
@@ -143,7 +144,17 @@ class C2Decomp{
 
 	void getDecompInfo(DecompInfo dcompinfo_in);
 	
+	void memSplitXY(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	void memMergeXY(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	void memSplitYZ(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	void memMergeYZ(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	void memSplitZY(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	void memMergeZY(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	void memSplitYX(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	void memMergeYX(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	
 
+	 
 };
 
 
