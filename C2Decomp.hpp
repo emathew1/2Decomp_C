@@ -138,7 +138,7 @@ class C2Decomp{
 	void initNeighbor();	
 	void getDist();
 	void distribute(int data1, int proc, int *st, int *en, int *sz);
-	void partition(int nx, int ny, int nz, int pdim[3], int lstart[3], int lend[3], int lsize[3]);
+	void partition(int nx, int ny, int nz, int *pdim, int *lstart, int *lend, int *lsize);
 	void prepareBuffer(DecompInfo *dii);
 
 	void getDecompInfo(DecompInfo dcompinfo_in);

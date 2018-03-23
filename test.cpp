@@ -45,7 +45,7 @@ int main(int argc, char *argv[]){
     }
 
 
-    int i = 0;
+    int i = 3;
 	if(mpiRank == i){
 		cout << "Rank " << i << endl;		
 	        cout << c2d->xStart[0] << " " << c2d->xStart[1] << " " << c2d->xStart[2] << endl;

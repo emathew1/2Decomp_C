@@ -227,7 +227,7 @@ void C2Decomp::distribute(int data1, int proc, int *st, int *en, int *sz){
     size1 = size1 + 1;
 
     for(int i = nl; i < proc; i++){
-	st[i] = en[i-1];
+	st[i] = en[i-1] + 1;
 	sz[i] = size1;
 	en[i] = en[i-1] + size1;
     }
@@ -236,11 +236,11 @@ void C2Decomp::distribute(int data1, int proc, int *st, int *en, int *sz){
     sz[proc-1] = data1 - st[proc-1]+1;
 };
 
-void C2Decomp::partition(int nx, int ny, int nz, int pdim[3], int lstart[3], int lend[3], int lsize[3]){
+void C2Decomp::partition(int nx, int ny, int nz, int *pdim, int *lstart, int *lend, int *lsize){
 
     int gsize;
 
-    for(int i = 0; i < 2; i++){
+    for(int i = 0; i < 3; i++){
 	
 	if(i == 0){
 	    gsize = nx;
@@ -254,6 +254,7 @@ void C2Decomp::partition(int nx, int ny, int nz, int pdim[3], int lstart[3], int
 	    lstart[i] = 1;
 	    lend[i]   = gsize;
 	    lsize[i]  = gsize;
+
 	}else if(pdim[i] == 1){
     	    int *st, *en, *sz;
 	    st = new int[dims[0]];
@@ -261,10 +262,11 @@ void C2Decomp::partition(int nx, int ny, int nz, int pdim[3], int lstart[3], int
 	    sz = new int[dims[0]];
 	    
 	    distribute(gsize, dims[0], st, en, sz);
-	
+
    	    lstart[i] = st[coord[0]];
 	    lend[i]   = en[coord[0]];
 	    lsize[i]  = sz[coord[0]];
+
 	    delete[] st;
 	    delete[] en;
 	    delete[] sz;
@@ -276,7 +278,7 @@ void C2Decomp::partition(int nx, int ny, int nz, int pdim[3], int lstart[3], int
 	    sz = new int[dims[1]];
 	    
 	    distribute(gsize, dims[1], st, en, sz);
-	
+
    	    lstart[i] = st[coord[1]];
 	    lend[i]   = en[coord[1]];
 	    lsize[i]  = sz[coord[1]];
@@ -285,6 +287,7 @@ void C2Decomp::partition(int nx, int ny, int nz, int pdim[3], int lstart[3], int
 	    delete[] en;
 	    delete[] sz;
 	}
+
     }
     
 
