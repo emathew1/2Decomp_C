@@ -8,6 +8,8 @@ void C2Decomp::decomp2DInit(int pRow, int pCol){
 
 	int errorcode, ierr, row, col;
 
+	row = 0; col = 0;
+
 	//Get the mpi rank and size
 	ierr = MPI_Comm_size(MPI_COMM_WORLD, &nProc);
 	ierr = MPI_Comm_rank(MPI_COMM_WORLD, &nRank);
@@ -326,7 +328,7 @@ void C2Decomp::prepareBuffer(DecompInfo *dii){
     dii->x1count = dii->x1dist[dims[0]-1]*dii->y1dist[dims[0]-1]*dii->xsz[2];
     dii->y1count = dii->x1count;
 
-    dii->y2count = dii->y2dist[dims[1]-1]*dii->z2dist[dims[2]-1]*dii->zsz[0];
+    dii->y2count = dii->y2dist[dims[1]-1]*dii->z2dist[dims[1]-1]*dii->zsz[0];
     dii->z2count = dii->y2count;
 
 

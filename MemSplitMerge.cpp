@@ -21,6 +21,7 @@ void C2Decomp::memSplitXY(double *in, int n1, int n2, int n3, double *out, int i
 		    int ii = k*n2*n1 + j*n1 + i;
 		    out[pos] = in[ii];
 		    pos++;
+	
 		}
 	    }
 	}
@@ -51,6 +52,7 @@ void C2Decomp::memMergeXY(double *in, int n1, int n2, int n3, double *out, int i
 		    int ii = k*n2*n1 + j*n1 + i;
 		    out[ii] = in[pos];
 		    pos++;
+
 		}
 	    }
 	}

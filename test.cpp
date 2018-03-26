@@ -32,12 +32,15 @@ int main(int argc, char *argv[]){
 
     }
  
-    int nx = 17, ny = 7, nz = 31;
-    int pRow = 2, pCol = 2;
+    int nx = 31, ny = 17, nz = 11;
+    int pRow = 2, pCol = 3;
     bool periodicBC[3] = {false, false, false};
 
+if(!mpiRank) cout << "initializing " << endl;
     C2Decomp *c2d;
     c2d = new C2Decomp(nx, ny, nz, pRow, pCol, periodicBC);
+    MPI_Barrier(MPI_COMM_WORLD);
+if(!mpiRank) cout << "done initializing " << endl;
     
     int m = 0;
     double data1[nz][ny][nx];
@@ -76,6 +79,16 @@ int main(int argc, char *argv[]){
 	}
     }
 
+    for(int ip = 0; ip < totRank; ip++){
+	if(mpiRank == ip){
+	   cout << "---"<< mpiRank << "---" << endl;
+	   for(int jp = 0; jp < xSize[0]*xSize[1]*xSize[2]; jp++){
+	       cout << u1[jp] << endl;
+	   } 
+	}
+	MPI_Barrier(MPI_COMM_WORLD);
+    } 
+
     c2d->transposeX2Y(u1, u2);
 
   if(!mpiRank){
@@ -89,8 +102,8 @@ int main(int argc, char *argv[]){
 	}
     }
   }
-/*
-    int i = 1;
+
+    int i = 0;
 	if(mpiRank == i){
 		cout << "Rank " << i << endl;		
 	        cout << c2d->xStart[0] << " " << c2d->xStart[1] << " " << c2d->xStart[2] << endl;
@@ -122,7 +135,7 @@ int main(int argc, char *argv[]){
 		cout << c2d->decompMain.y2dist[j] << " " << c2d->decompMain.z2dist[j] << endl;
 	    }
 	}
-*/
+
 
     c2d->deallocXYZ(u1);
     c2d->deallocXYZ(u2);
