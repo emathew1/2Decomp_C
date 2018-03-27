@@ -32,8 +32,8 @@ int main(int argc, char *argv[]){
 
     }
  
-    int nx = 31, ny = 17, nz = 11;
-    int pRow = 2, pCol = 6;
+    int nx = 100, ny = 100, nz = 100;
+    int pRow = 2, pCol = 2;
     bool periodicBC[3] = {false, false, false};
 
 if(!mpiRank) cout << "initializing " << endl;
@@ -192,6 +192,18 @@ if(!mpiRank) cout << "done initializing " << endl;
        }
     }
 */
+
+    MPI_Request y2zHandle;
+    t1 = MPI_Wtime();
+    c2d->transposeY2Z_Start(y2zHandle, u2, u3, sbuf, rbuf);
+    t2 = MPI_Wtime();
+    c2d->transposeY2Z_Wait(y2zHandle, u2, u3, sbuf, rbuf);
+    t3 = MPI_Wtime();
+    if(mpiRank == 0){
+	printf( "Y2Z Nonblocking Start Elapsed time is %f\n", t2 - t1 );
+	printf( "Y2Z Nonblocking Wait Elapsed time is %f\n", t3 - t2 );
+    }
+
 
     delete[] sbuf;
     delete[] rbuf;
