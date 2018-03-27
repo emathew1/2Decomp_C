@@ -180,6 +180,7 @@ void C2Decomp::decompInfoInit(){
 
 	work1_r = new double[bufSize];
 	work2_r = new double[bufSize];
+	decompBufSize = bufSize;
     }
 
 };
