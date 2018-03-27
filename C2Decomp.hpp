@@ -63,6 +63,7 @@ class C2Decomp{
     public:
 	//main default decomposition information for global size nx*ny*nz
 	DecompInfo decompMain;
+	int decompBufSize;
 
 	
     public:
@@ -75,7 +76,6 @@ class C2Decomp{
 
     private:
 	//These are the buffers used by MPI_ALLTOALL(V) calls
-	int decompBufSize;
 	double *work1_r, *work2_r; //Only implementing real for now... 
         
 
@@ -111,17 +111,17 @@ class C2Decomp{
 	void transposeY2X(double *src, double *dst);
 	
 	//calls for overlapping communication and computation...
-	void transposeX2Y_Start(int handle, double *src, double *dst, double *sbuf, double *rbuf);
-	void transposeX2Y_Wait (int handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeX2Y_Start(MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeX2Y_Wait (MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
 
-	void transposeY2Z_Start(int handle, double *src, double *dst, double *sbuf, double *rbuf);
-	void transposeY2Z_Wait (int handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeY2Z_Start(MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeY2Z_Wait (MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
 
-	void transposeZ2Y_Start(int handle, double *src, double *dst, double *sbuf, double *rbuf);
-	void transposeZ2Y_Wait (int handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeZ2Y_Start(MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeZ2Y_Wait (MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
 	
-	void transposeY2X_Start(int handle, double *src, double *dst, double *sbuf, double *rbuf);
-	void transposeY2X_Wait (int handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeY2X_Start(MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeY2X_Wait (MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
 	
 	void decompInfoInit();
 	void decompInfoFinalize(DecompInfo decompinfo_in);

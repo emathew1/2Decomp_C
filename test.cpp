@@ -80,8 +80,15 @@ if(!mpiRank) cout << "done initializing " << endl;
 	}
     }
 
+    double t1, t2, t3;
+    t1 = MPI_Wtime();
     c2d->transposeX2Y(u1, u2);
+    t2 = MPI_Wtime();
 
+    if(mpiRank == 0){
+	printf( "X2Y Elapsed time is %f\n", t2 - t1 );
+    }
+/*
     if(mpiRank==0){
       //Testing transposition
       for(int kp = 0; kp < ySize[2]; kp++){
@@ -93,9 +100,15 @@ if(!mpiRank) cout << "done initializing " << endl;
  	  }
        }
     }
-
+*/
+    t1 = MPI_Wtime();
     c2d->transposeY2Z(u2, u3);
+    t2 = MPI_Wtime();
+    if(mpiRank == 0){
+	printf( "Y2Z Elapsed time is %f\n", t2 - t1 );
+    }
 
+/*
     if(mpiRank==0){
     //Testing transposition
       for(int kp = 0; kp < zSize[2]; kp++){
@@ -107,9 +120,15 @@ if(!mpiRank) cout << "done initializing " << endl;
   	}
       }
     }
-
+*/
+    t1 = MPI_Wtime();
     c2d->transposeZ2Y(u3, u2);
+    t2 = MPI_Wtime();
+    if(mpiRank == 0){
+	printf( "Z2Y Elapsed time is %f\n", t2 - t1 );
+    }
 
+/*
     if(mpiRank==0){
       //Testing transposition
       for(int kp = 0; kp < ySize[2]; kp++){
@@ -121,9 +140,15 @@ if(!mpiRank) cout << "done initializing " << endl;
  	  }
        }
     }
-
+*/
+    t1 = MPI_Wtime();
     c2d->transposeY2X(u2, u1);
+    t2 = MPI_Wtime();
+    if(mpiRank == 0){
+	printf( "Y2X Elapsed time is %f\n", t2 - t1 );
+    }
 
+/*
     if(mpiRank==0){
       //Testing transposition
       for(int kp = 0; kp < xSize[2]; kp++){
@@ -135,10 +160,41 @@ if(!mpiRank) cout << "done initializing " << endl;
  	  }
        }
     }
+*/
+
+    //allocate new buffers for non-blocking comms
+    double *sbuf = new double[c2d->decompBufSize];
+    double *rbuf = new double[c2d->decompBufSize];
+
+    MPI_Request x2yHandle;
+
+    t1 = MPI_Wtime();
+    c2d->transposeX2Y_Start(x2yHandle, u1, u2, sbuf, rbuf);
+    t2 = MPI_Wtime();
+    c2d->transposeX2Y_Wait(x2yHandle, u1, u2, sbuf, rbuf);
+    t3 = MPI_Wtime();
+    if(mpiRank == 0){
+	printf( "X2Y Nonblocking Start Elapsed time is %f\n", t2 - t1 );
+	printf( "X2Y Nonblocking Wait Elapsed time is %f\n", t3 - t2 );
+    }
 
 
+/*
+    if(mpiRank==9){
+      //Testing transposition
+      for(int kp = 0; kp < ySize[2]; kp++){
+	  for(int jp = 0; jp < ySize[1]; jp++){
+	      for(int ip = 0; ip < ySize[0]; ip++){
+	  	  int ii = kp*ySize[1]*ySize[0] + jp*ySize[0] + ip;
+		  cout << u2[ii] << " " << data1[c2d->yStart[2]+kp][c2d->yStart[1]+jp][c2d->yStart[0]+ip] << endl;
+	      }
+ 	  }
+       }
+    }
+*/
 
-
+    delete[] sbuf;
+    delete[] rbuf;
     c2d->deallocXYZ(u1);
     c2d->deallocXYZ(u2);
     c2d->deallocXYZ(u3);
