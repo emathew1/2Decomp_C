@@ -7,6 +7,7 @@
 #include <iostream>
 #include "math.h"
 #include <string>
+#include <memory.h>
 
 using namespace::std;
 
@@ -152,6 +153,17 @@ class C2Decomp{
 	void memMergeZY(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
 	void memSplitYX(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
 	void memMergeYX(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	
+  	//IO
+	void writeOne(int ipencil, double *var, string filename);
+	void writeVar(MPI_File &fh, MPI_Offset &disp, int ipencil, double *var);
+	void writeScalar(MPI_File &fh, MPI_Offset &disp, int n, double *var);
+	void writePlane(int ipencil, double *var, int iplane, int n, string filename);
+	void writeEvery(int ipencil, double *var, int iskip, int jskip, int kskip, string filename, int from1);
+	
+	void readOne(int ipencil, double *var, string filename);
+	void readVar(MPI_File &fh, MPI_Offset &disp, int ipencil, double *var);
+	void readScalar(MPI_File &fh, MPI_Offset &disp, int n, double *var);
 	
 
 	 

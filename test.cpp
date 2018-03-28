@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
     }
  
     int nx = 10, ny = 10, nz = 10;
-    int pRow = 2, pCol = 3;
+    int pRow = 2, pCol = 2;
     bool periodicBC[3] = {false, false, false};
 
 if(!mpiRank) cout << "initializing " << endl;
@@ -268,6 +268,7 @@ if(!mpiRank) cout << "done initializing " << endl;
     }
 */
 
+    c2d->writeOne(0, u1, "test.out");
 
     delete[] sbuf;
     delete[] rbuf;
