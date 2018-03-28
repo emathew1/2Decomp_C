@@ -31,7 +31,7 @@ void C2Decomp::writeOne(int ipencil, double *var, string filename){
 
     data_type = MPI_DOUBLE;
 
-    MPI_Type_create_subarray(3, sizes, subsizes, starts, MPI_ORDER_C, data_type, &new_type);
+    MPI_Type_create_subarray(3, sizes, subsizes, starts, MPI_ORDER_FORTRAN, data_type, &new_type);
     MPI_Type_commit(&new_type);
 
     MPI_File_open(MPI_COMM_WORLD, filename.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
