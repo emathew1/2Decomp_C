@@ -95,3 +95,44 @@ void C2Decomp::readOne(int ipencil, double *var, string filename){
 
     MPI_Type_free(&new_type);
 }
+
+void C2Decomp::writeVar(MPI_File &fh, MPI_Offset &disp, int ipencil, double *var){
+
+    int sizes[3], subsizes[3], starts[3];
+    MPI_Datatype data_type, new_type;
+
+    sizes[0] = decompMain.xsz[0];
+    sizes[1] = decompMain.ysz[1];
+    sizes[2] = decompMain.zsz[2];
+
+    if(ipencil == 0){
+        for(int ip = 0; ip < 3; ip++){
+            subsizes[ip] = decompMain.xsz[ip];
+            starts[ip] = decompMain.xst[ip]-1;
+        }
+    }else if(ipencil == 1){
+        for(int ip = 0; ip < 3; ip++){
+            subsizes[ip] = decompMain.ysz[ip];
+            starts[ip] = decompMain.yst[ip]-1;
+        }
+    }else if(ipencil == 2){
+        for(int ip = 0; ip < 3; ip++){
+            subsizes[ip] = decompMain.zsz[ip];
+            starts[ip] = decompMain.zst[ip]-1;
+        }
+    }
+
+    data_type = MPI_DOUBLE;
+
+    MPI_Type_create_subarray(3, sizes, subsizes, starts, MPI_ORDER_FORTRAN, data_type, &new_type);
+    MPI_Type_commit(&new_type);
+
+    MPI_File_set_view(fh, disp, data_type, new_type, "native", MPI_INFO_NULL);
+
+    MPI_File_write_all(fh, var, subsizes[0]*subsizes[1]*subsizes[2], data_type, MPI_STATUS_IGNORE);
+    
+    MPI_Type_free(&new_type);
+
+    disp += sizes[0]*sizes[1]*sizes[2]*myTypeBytes;
+    
+}
