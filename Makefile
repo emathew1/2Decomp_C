@@ -1,7 +1,7 @@
 
 include Makefile.in
 
-OBJECTS  = test.o C2Decomp.o Alloc.o TransposeX2Y.o TransposeY2Z.o TransposeZ2Y.o TransposeY2X.o MemSplitMerge.cpp IO.cpp
+OBJECTS  = test.o C2Decomp.o Alloc.o TransposeX2Y.o TransposeY2Z.o TransposeZ2Y.o TransposeY2X.o MemSplitMerge.cpp IO.o
 
 all: TEST
 
