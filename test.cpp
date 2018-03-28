@@ -204,7 +204,7 @@ if(!mpiRank) cout << "done initializing " << endl;
 	printf( "Y2Z Nonblocking Wait Elapsed time is %f\n", t3 - t2 );
     }
 
-
+/*
     if(mpiRank==0){
     //Testing transposition
       for(int kp = 0; kp < zSize[2]; kp++){
@@ -216,7 +216,7 @@ if(!mpiRank) cout << "done initializing " << endl;
   	}
       }
     }
-
+*/
 
     MPI_Request z2yHandle;
     t1 = MPI_Wtime();
@@ -229,6 +229,7 @@ if(!mpiRank) cout << "done initializing " << endl;
 	printf( "Z2Y Nonblocking Wait Elapsed time is %f\n", t3 - t2 );
     }
 
+/*
     if(mpiRank==0){
       //Testing transposition
       for(int kp = 0; kp < ySize[2]; kp++){
@@ -240,7 +241,32 @@ if(!mpiRank) cout << "done initializing " << endl;
  	  }
        }
     }
+*/
 
+    MPI_Request y2xHandle;
+    t1 = MPI_Wtime();
+    c2d->transposeY2X_Start(y2xHandle, u2, u1, sbuf, rbuf);
+    t2 = MPI_Wtime();
+    c2d->transposeY2X_Wait(y2xHandle, u2, u1, sbuf, rbuf);
+    t3 = MPI_Wtime();
+    if(mpiRank == 0){
+	printf( "Y2X Nonblocking Start Elapsed time is %f\n", t2 - t1 );
+	printf( "Y2X Nonblocking Wait Elapsed time is %f\n", t3 - t2 );
+    }
+
+/*
+    if(mpiRank==0){
+      //Testing transposition
+      for(int kp = 0; kp < xSize[2]; kp++){
+	  for(int jp = 0; jp < xSize[1]; jp++){
+	      for(int ip = 0; ip < xSize[0]; ip++){
+	  	  int ii = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
+		  cout << u1[ii] << " " << data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip] << endl;
+	      }
+ 	  }
+       }
+    }
+*/
 
 
     delete[] sbuf;
