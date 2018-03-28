@@ -49,8 +49,6 @@ void C2Decomp::transposeY2Z_Wait(MPI_Request &handle, double *src, double *dst, 
 
     MPI_Wait(&handle, &status);
 
-    for(int ip = 0; ip < d1*d2*d3; ip++){
-	dst[ip] = rbuf[ip];
-    }	
+    memcpy(dst, rbuf, d1*d2*d3*sizeof(double));
 
 }
