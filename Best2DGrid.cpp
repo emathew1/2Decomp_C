@@ -57,6 +57,7 @@ void C2Decomp::best2DGrid(int iproc, int &best_pRow, int &best_pCol){
 	for(int ip = 0; ip < nfact; ip++){
 	    cout << factors[ip] << " ";
 	}
+	cout << endl;
     }
 
     for(int ip = 0; ip < nfact; ip++){
@@ -68,8 +69,8 @@ void C2Decomp::best2DGrid(int iproc, int &best_pRow, int &best_pCol){
 	    dims[0] = row;
 	    dims[1] = col;
 	 
-	    periodic[0] = false;
-	    periodic[1] = false;
+	    periodic[0] = 0;
+	    periodic[1] = 0;
 
 	    MPI_Cart_create(MPI_COMM_WORLD, 2, dims, periodic, 0, &DECOMP_2D_COMM_CART_X);
 	    MPI_Cart_coords(DECOMP_2D_COMM_CART_X, nRank, 2, coord);

@@ -379,9 +379,6 @@ void C2Decomp::decompInfoFinalize(){
     work1_r = NULL;
     work2_r = NULL;
 
-    if(!nRank){
-	cout << "Done deallocation of decomp Info" << endl;
-    }    
 }
 
 

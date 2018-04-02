@@ -215,19 +215,21 @@ if(!mpiRank) cout << "done initializing " << endl;
 	printf( "Y2Z Nonblocking Wait Elapsed time is %f\n", t3 - t2 );
     }
 
-/*
-    if(mpiRank==0){
+
     //Testing transposition
-      for(int kp = 0; kp < zSize[2]; kp++){
-	  for(int jp = 0; jp < zSize[1]; jp++){
+    for(int kp = 0; kp < zSize[2]; kp++){
+        for(int jp = 0; jp < zSize[1]; jp++){
 	    for(int ip = 0; ip < zSize[0]; ip++){
 		int ii = kp*zSize[1]*zSize[0] + jp*zSize[0] + ip;
-		cout << u3[ii] << " " << data1[c2d->zStart[2]+kp][c2d->zStart[1]+jp][c2d->zStart[0]+ip] << endl;
+		double temp = u3[ii];
+		double temp1= data1[c2d->zStart[2]+kp][c2d->zStart[1]+jp][c2d->zStart[0]+ip];
+		if(fabs(temp-temp1)>1E-16){  
+		    cout << "Error in nonblocking Y2Z transposition" << endl;
+		}
  	    }
   	}
-      }
     }
-*/
+
 
     MPI_Request z2yHandle;
     t1 = MPI_Wtime();
@@ -240,19 +242,21 @@ if(!mpiRank) cout << "done initializing " << endl;
 	printf( "Z2Y Nonblocking Wait Elapsed time is %f\n", t3 - t2 );
     }
 
-/*
-    if(mpiRank==0){
-      //Testing transposition
-      for(int kp = 0; kp < ySize[2]; kp++){
-	  for(int jp = 0; jp < ySize[1]; jp++){
-	      for(int ip = 0; ip < ySize[0]; ip++){
-	  	  int ii = kp*ySize[1]*ySize[0] + jp*ySize[0] + ip;
-		  cout << u2[ii] << " " << data1[c2d->yStart[2]+kp][c2d->yStart[1]+jp][c2d->yStart[0]+ip] << endl;
-	      }
- 	  }
-       }
+
+    //Testing transposition
+    for(int kp = 0; kp < ySize[2]; kp++){
+	for(int jp = 0; jp < ySize[1]; jp++){
+	    for(int ip = 0; ip < ySize[0]; ip++){
+	  	int ii = kp*ySize[1]*ySize[0] + jp*ySize[0] + ip;
+		double temp = u2[ii];
+		double temp1= data1[c2d->yStart[2]+kp][c2d->yStart[1]+jp][c2d->yStart[0]+ip]; 
+		if(fabs(temp-temp1)>1E-16){  
+		    cout << "Error in nonblocking Z2Y transposition" << endl;
+	   	}
+	    }
+ 	}
     }
-*/
+
 
     MPI_Request y2xHandle;
     t1 = MPI_Wtime();
@@ -265,40 +269,54 @@ if(!mpiRank) cout << "done initializing " << endl;
 	printf( "Y2X Nonblocking Wait Elapsed time is %f\n", t3 - t2 );
     }
 
-/*
-    if(mpiRank==0){
-      //Testing transposition
-      for(int kp = 0; kp < xSize[2]; kp++){
-	  for(int jp = 0; jp < xSize[1]; jp++){
-	      for(int ip = 0; ip < xSize[0]; ip++){
-	  	  int ii = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
-		  cout << u1[ii] << " " << data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip] << endl;
-	      }
- 	  }
-       }
+
+    //Testing transposition
+    for(int kp = 0; kp < xSize[2]; kp++){
+	for(int jp = 0; jp < xSize[1]; jp++){
+	    for(int ip = 0; ip < xSize[0]; ip++){
+	  	int ii = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
+		double temp = u1[ii];
+		double temp1= data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip]; 
+		if(fabs(temp-temp1)>1E-16){  
+		    cout << "Error in nonblocking Y2X transposition" << endl;
+	   	}
+	    }
+ 	}
     }
-*/
+
 
     double *u4;
     c2d->allocX(u4);
 
+
+    t1 = MPI_Wtime();
     c2d->writeOne(0, u1, "test.out");
     MPI_Barrier(MPI_COMM_WORLD);
     c2d->readOne(0, u4, "test.out");
+    t2 = MPI_Wtime();
 
-     if(mpiRank==2){
-      //Testing transposition
-      for(int kp = 0; kp < xSize[2]; kp++){
-	  for(int jp = 0; jp < xSize[1]; jp++){
-	      for(int ip = 0; ip < xSize[0]; ip++){
-	  	  int ii = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
-//		  cout << u1[ii] << " " << u4[ii] << " " << data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip] << endl;
-	      }
- 	  }
-       }
+      //Testing write and read one...
+    for(int kp = 0; kp < xSize[2]; kp++){
+	for(int jp = 0; jp < xSize[1]; jp++){
+	    for(int ip = 0; ip < xSize[0]; ip++){
+	  	int ii = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
+		double temp = u1[ii];
+		double temp1= u4[ii];
+		if(fabs(temp-temp1)>1E-16){
+		    cout << "Error in write/readOne()" << endl;
+		}
+	    }
+ 	}
     }
-   
+    
+    if(!mpiRank){
+ //	printf("writeOne/readOne elapsed time is %f\n", t2-t1);
+    }   
 
+
+
+
+    t1 = MPI_Wtime();
 
     //Write out to large file
     MPI_File fh;
@@ -336,6 +354,13 @@ if(!mpiRank) cout << "done initializing " << endl;
     c2d->readVar(fh, disp, 0, u4a);
 
     MPI_File_close(&fh);
+
+    t2 = MPI_Wtime();
+
+    if(!mpiRank){
+ //	printf("writeVar/readVar w/ four variables, elapsed time is %f\n", t2-t1);
+    }   
+
 
 
     delete[] sbuf;

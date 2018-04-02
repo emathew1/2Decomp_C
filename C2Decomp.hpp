@@ -137,7 +137,7 @@ class C2Decomp{
 	void allocZ(double *&var); 
 	void deallocXYZ(double *&var);
 
-	void updateHalo(double *in, double *out, int level);
+	void updateHalo(double *in, double *out, int level, int ipencil);
 
 	void decomp2DAbort(int errorCode, string msg);
 	void initNeighbor();	
