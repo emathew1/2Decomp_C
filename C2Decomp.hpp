@@ -128,7 +128,7 @@ class C2Decomp{
 	void transposeY2X_Wait (MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
 	
 	void decompInfoInit();
-	void decompInfoFinalize(DecompInfo decompinfo_in);
+	void decompInfoFinalize();
 
 
 	//only doing real 

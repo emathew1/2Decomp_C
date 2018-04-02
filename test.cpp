@@ -292,7 +292,7 @@ if(!mpiRank) cout << "done initializing " << endl;
 	  for(int jp = 0; jp < xSize[1]; jp++){
 	      for(int ip = 0; ip < xSize[0]; ip++){
 	  	  int ii = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
-		  cout << u1[ii] << " " << u4[ii] << " " << data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip] << endl;
+//		  cout << u1[ii] << " " << u4[ii] << " " << data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip] << endl;
 	      }
  	  }
        }

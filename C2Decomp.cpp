@@ -337,3 +337,53 @@ void C2Decomp::prepareBuffer(DecompInfo *dii){
 
 
 }
+
+void C2Decomp::decompInfoFinalize(){
+
+    decompBufSize = 0; 
+
+    delete[] decompMain.x1dist;
+    delete[] decompMain.y1dist;
+    delete[] decompMain.y2dist;
+    delete[] decompMain.z2dist;
+
+    delete[] decompMain.x1cnts;
+    delete[] decompMain.y1cnts;
+    delete[] decompMain.y2cnts;
+    delete[] decompMain.z2cnts;
+
+    delete[] decompMain.x1disp;
+    delete[] decompMain.y1disp;
+    delete[] decompMain.y2disp;
+    delete[] decompMain.z2disp;
+
+    delete[] work1_r;
+    delete[] work2_r;
+
+
+    decompMain.x1dist = NULL;
+    decompMain.y1dist = NULL;
+    decompMain.y2dist = NULL;
+    decompMain.z2dist = NULL;
+
+    decompMain.x1cnts = NULL;
+    decompMain.y1cnts = NULL;
+    decompMain.y2cnts = NULL;
+    decompMain.z2cnts = NULL;
+
+    decompMain.x1disp = NULL;
+    decompMain.y1disp = NULL;
+    decompMain.y2disp = NULL;
+    decompMain.z2disp = NULL;
+
+    work1_r = NULL;
+    work2_r = NULL;
+
+    if(!nRank){
+	cout << "Done deallocation of decomp Info" << endl;
+    }    
+}
+
+
+
+
