@@ -1,12 +1,10 @@
 
 include Makefile.in
 
-OBJECTS  = test.o C2Decomp.o Alloc.o TransposeX2Y.o TransposeY2Z.o TransposeZ2Y.o TransposeY2X.o MemSplitMerge.cpp IO.o Best2DGrid.o Halo.o
+TEST_OBJECTS  = test.o C2Decomp.o Alloc.o TransposeX2Y.o TransposeY2Z.o TransposeZ2Y.o TransposeY2X.o MemSplitMerge.cpp IO.o Best2DGrid.o Halo.o
+HALOTEST_OBJECTS  = halo_test.o C2Decomp.o Alloc.o TransposeX2Y.o TransposeY2Z.o TransposeZ2Y.o TransposeY2X.o MemSplitMerge.cpp IO.o Best2DGrid.o Halo.o
 
-all: TEST
-
-test.o: test.cpp C2Decomp.hpp 
-	$(CC) $(CFLAGS) -c $< 
+all: TEST HALO_TEST
 
 TransposeX2Y.o: TransposeX2Y.cpp C2Decomp.hpp  
 	$(CC) $(CFLAGS) -c $< 
@@ -38,8 +36,19 @@ Halo.o: Halo.cpp C2Decomp.hpp
 C2Decomp.o: C2Decomp.cpp C2Decomp.hpp
 	$(CC) $(CFLAGS) -c $< 
 
-TEST:  $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o $@ $(LIBF) 
+test.o: test.cpp C2Decomp.hpp 
+	$(CC) $(CFLAGS) -c $< 
+
+halo_test.o: halo_test.cpp C2Decomp.hpp 
+	$(CC) $(CFLAGS) -c $< 
+
+TEST:  $(TEST_OBJECTS)
+	$(CC) $(CFLAGS) $(TEST_OBJECTS) -o $@ $(LIBF) 
+
+HALO_TEST:  $(HALOTEST_OBJECTS)
+	$(CC) $(CFLAGS) $(HALOTEST_OBJECTS) -o $@ $(LIBF) 
+
+
 
 clean: 
 	rm -rf   *.o 

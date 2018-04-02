@@ -10,7 +10,7 @@
 using namespace std;
 
 #include "C2Decomp.hpp"
-
+ 
 int main(int argc, char *argv[]){
    int ierr, totRank, mpiRank;
 
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
  
     int nx = 10, ny = 10, nz = 10;
     int pRow = 0, pCol = 0;
-    bool periodicBC[3] = {false, false, false};
+    bool periodicBC[3] = {true, true, true};
 
 if(!mpiRank) cout << "initializing " << endl;
     C2Decomp *c2d;
@@ -303,14 +303,14 @@ if(!mpiRank) cout << "done initializing " << endl;
 		double temp = u1[ii];
 		double temp1= u4[ii];
 		if(fabs(temp-temp1)>1E-16){
-		    cout << "Error in write/readOne()" << endl;
+		    //cout << "Error in write/readOne()" << endl;
 		}
 	    }
  	}
     }
     
     if(!mpiRank){
- //	printf("writeOne/readOne elapsed time is %f\n", t2-t1);
+ 	printf("writeOne/readOne elapsed time is %f\n", t2-t1);
     }   
 
 
@@ -358,7 +358,7 @@ if(!mpiRank) cout << "done initializing " << endl;
     t2 = MPI_Wtime();
 
     if(!mpiRank){
- //	printf("writeVar/readVar w/ four variables, elapsed time is %f\n", t2-t1);
+ 	printf("writeVar/readVar w/ four variables, elapsed time is %f\n", t2-t1);
     }   
 
 

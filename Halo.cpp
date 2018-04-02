@@ -1,6 +1,6 @@
 #include "C2Decomp.hpp"
 
-void C2Decomp::updateHalo(double *in, double *out, int level, int ipencil){
+void C2Decomp::updateHalo(double *in, double *&out, int level, int ipencil){
 
     int xs, ys, zs, xe, ye, ze;
    
@@ -83,6 +83,8 @@ void C2Decomp::updateHalo(double *in, double *out, int level, int ipencil){
 	}
     }
 
+
+ 
    //If needed, define MPI derived data type to pack halo data, then call MPI send/receive to exchange data
     if(ipencil == 0){
 
@@ -94,13 +96,13 @@ void C2Decomp::updateHalo(double *in, double *out, int level, int ipencil){
 	if(coord[0] == dims[0]-1 && periodicY){
 	    tag_n = 0;
 	}else{
-	    tag_s = coord[0]+1;
+	    tag_n = coord[0]+1;
 	}
 
 	icount  = s3 + 2*level;
 	ilength = level*s1;
 	ijump   = s1*(s2+2*level);
-
+	
 	MPI_Type_vector(icount, ilength, ijump, datatype, &halo12);
 	MPI_Type_commit(&halo12);
 
@@ -108,10 +110,10 @@ void C2Decomp::updateHalo(double *in, double *out, int level, int ipencil){
 	double *southRecvLocation, *northRecvLocation;
 	double *southSendLocation, *northSendLocation;
 
-	southRecvLocation = &out[(zs-1)*outYsize*outXsize + (ys-1)*outXsize 	      + xs-1]; 
-	northRecvLocation = &out[(zs-1)*outYsize*outXsize + (ye-level)*outXsize       + xs-1]; 
-	southSendLocation = &out[(zs-1)*outYsize*outXsize + (ys+level-1)*outXsize     + xs-1]; 
-	northSendLocation = &out[(zs-1)*outYsize*outXsize + (ye-level-level)*outXsize + xs-1]; 
+	southRecvLocation = &out[(zs+level-1)*outYsize*outXsize + (ys+level-1)*outXsize 	  + xs+level-1]; 
+	northRecvLocation = &out[(zs+level-1)*outYsize*outXsize + (ye+level-level)*outXsize       + xs+level-1]; 
+	southSendLocation = &out[(zs+level-1)*outYsize*outXsize + (ys+level+level-1)*outXsize     + xs+level-1]; 
+	northSendLocation = &out[(zs+level-1)*outYsize*outXsize + (ye+level-level-level)*outXsize + xs+level-1]; 
 
 	MPI_Irecv(southRecvLocation,  1, halo12, neighbor[0][3], tag_s, DECOMP_2D_COMM_CART_X, &requests[0]);
 	MPI_Irecv(northRecvLocation,  1, halo12, neighbor[0][2], tag_n, DECOMP_2D_COMM_CART_X, &requests[1]);
@@ -134,10 +136,10 @@ void C2Decomp::updateHalo(double *in, double *out, int level, int ipencil){
 	double *bottomRecvLocation, *topRecvLocation;
 	double *bottomSendLocation, *topSendLocation;
 
-	bottomRecvLocation = &out[(zs-1)*outYsize*outXsize           + (ys-1)*outXsize + xs-1]; 
-	topRecvLocation    = &out[(ze-level)*outYsize*outXsize       + (ys-1)*outXsize + xs-1]; 
-	bottomSendLocation = &out[(zs+level-1)*outYsize*outXsize     + (ys-1)*outXsize + xs-1]; 
-	topSendLocation    = &out[(ze-level-level)*outYsize*outXsize + (ys-1)*outXsize + xs-1]; 
+	bottomRecvLocation = &out[(zs+level-1)*outYsize*outXsize           + (ys+level-1)*outXsize + xs+level-1]; 
+	topRecvLocation    = &out[(ze+level-level)*outYsize*outXsize       + (ys+level-1)*outXsize + xs+level-1]; 
+	bottomSendLocation = &out[(zs+level+level-1)*outYsize*outXsize     + (ys+level-1)*outXsize + xs+level-1]; 
+	topSendLocation    = &out[(ze+level-level-level)*outYsize*outXsize + (ys+level-1)*outXsize + xs+level-1]; 
 
         MPI_Irecv(bottomRecvLocation,  icount, datatype, neighbor[0][5], tag_b, DECOMP_2D_COMM_CART_X, &requests[0]);
 	MPI_Irecv(topRecvLocation,     icount, datatype, neighbor[0][4], tag_t, DECOMP_2D_COMM_CART_X, &requests[1]);
@@ -167,10 +169,10 @@ void C2Decomp::updateHalo(double *in, double *out, int level, int ipencil){
 	double *eastRecvLocation, *westRecvLocation;
 	double *eastSendLocation, *westSendLocation;
 
-	eastRecvLocation = &out[(zs-1)*outYsize*outXsize + (ys-1)*outXsize + xs-1]; 
-	westRecvLocation = &out[(zs-1)*outYsize*outXsize + (ys-1)*outXsize + xe-level]; 
-	eastSendLocation = &out[(zs-1)*outYsize*outXsize + (ys-1)*outXsize + xs+level-1]; 
-	westSendLocation = &out[(zs-1)*outYsize*outXsize + (ys-1)*outXsize + xe-level-level]; 
+	eastRecvLocation = &out[(zs+level-1)*outYsize*outXsize + (ys+level-1)*outXsize + xs+level-1]; 
+	westRecvLocation = &out[(zs+level-1)*outYsize*outXsize + (ys+level-1)*outXsize + xe+level-level]; 
+	eastSendLocation = &out[(zs+level-1)*outYsize*outXsize + (ys+level-1)*outXsize + xs+level+level-1]; 
+	westSendLocation = &out[(zs+level-1)*outYsize*outXsize + (ys+level-1)*outXsize + xe+level-level-level]; 
 
 	MPI_Irecv(westRecvLocation,  1, halo21, neighbor[1][1], tag_w, DECOMP_2D_COMM_CART_Y, &requests[0]);
 	MPI_Irecv(eastRecvLocation,  1, halo21, neighbor[1][0], tag_e, DECOMP_2D_COMM_CART_Y, &requests[1]);
@@ -196,10 +198,10 @@ void C2Decomp::updateHalo(double *in, double *out, int level, int ipencil){
 	double *bottomRecvLocation, *topRecvLocation;
 	double *bottomSendLocation, *topSendLocation;
 
-	bottomRecvLocation = &out[(zs-1)*outYsize*outXsize           + (ys-1)*outXsize + xs-1]; 
-	topRecvLocation    = &out[(ze-level)*outYsize*outXsize       + (ys-1)*outXsize + xs-1]; 
-	bottomSendLocation = &out[(zs+level-1)*outYsize*outXsize     + (ys-1)*outXsize + xs-1]; 
-	topSendLocation    = &out[(ze-level-level)*outYsize*outXsize + (ys-1)*outXsize + xs-1]; 
+	bottomRecvLocation = &out[(zs+level-1)*outYsize*outXsize           + (ys+level-1)*outXsize + xs+level-1]; 
+	topRecvLocation    = &out[(ze+level-level)*outYsize*outXsize       + (ys+level-1)*outXsize + xs+level-1]; 
+	bottomSendLocation = &out[(zs+level+level-1)*outYsize*outXsize     + (ys+level-1)*outXsize + xs+level-1]; 
+	topSendLocation    = &out[(ze+level-level-level)*outYsize*outXsize + (ys+level-1)*outXsize + xs+level-1]; 
 
         MPI_Irecv(bottomRecvLocation,  icount, datatype, neighbor[1][5], tag_b, DECOMP_2D_COMM_CART_Y, &requests[0]);
 	MPI_Irecv(topRecvLocation,     icount, datatype, neighbor[1][4], tag_t, DECOMP_2D_COMM_CART_Y, &requests[1]);
@@ -228,10 +230,10 @@ void C2Decomp::updateHalo(double *in, double *out, int level, int ipencil){
 	double *eastRecvLocation, *westRecvLocation;
 	double *eastSendLocation, *westSendLocation;
 
-	eastRecvLocation = &out[(zs-1)*outYsize*outXsize + (ys-1)*outXsize + xs-1]; 
-	westRecvLocation = &out[(zs-1)*outYsize*outXsize + (ys-1)*outXsize + xe-level]; 
-	eastSendLocation = &out[(zs-1)*outYsize*outXsize + (ys-1)*outXsize + xs+level-1]; 
-	westSendLocation = &out[(zs-1)*outYsize*outXsize + (ys-1)*outXsize + xe-level-level]; 
+	eastRecvLocation = &out[(zs+level-1)*outYsize*outXsize + (ys+level-1)*outXsize + xs+level-1]; 
+	westRecvLocation = &out[(zs+level-1)*outYsize*outXsize + (ys+level-1)*outXsize + xe+level-level]; 
+	eastSendLocation = &out[(zs+level-1)*outYsize*outXsize + (ys+level-1)*outXsize + xs+level+level-1]; 
+	westSendLocation = &out[(zs+level-1)*outYsize*outXsize + (ys+level-1)*outXsize + xe+level-level-level]; 
 
 	MPI_Irecv(westRecvLocation,  1, halo31, neighbor[2][1], tag_w, DECOMP_2D_COMM_CART_Z, &requests[0]);
 	MPI_Irecv(eastRecvLocation,  1, halo31, neighbor[2][0], tag_e, DECOMP_2D_COMM_CART_Z, &requests[1]);
@@ -260,10 +262,10 @@ void C2Decomp::updateHalo(double *in, double *out, int level, int ipencil){
 	double *southRecvLocation, *northRecvLocation;
 	double *southSendLocation, *northSendLocation;
 
-	southRecvLocation = &out[(zs-1)*outYsize*outXsize + (ys-1)*outXsize 	      + xs-1]; 
-	northRecvLocation = &out[(zs-1)*outYsize*outXsize + (ye-level)*outXsize       + xs-1]; 
-	southSendLocation = &out[(zs-1)*outYsize*outXsize + (ys+level-1)*outXsize     + xs-1]; 
-	northSendLocation = &out[(zs-1)*outYsize*outXsize + (ye-level-level)*outXsize + xs-1]; 
+	southRecvLocation = &out[(zs+level-1)*outYsize*outXsize + (ys+level-1)*outXsize           + xs+level-1]; 
+	northRecvLocation = &out[(zs+level-1)*outYsize*outXsize + (ye+level-level)*outXsize       + xs+level-1]; 
+	southSendLocation = &out[(zs+level-1)*outYsize*outXsize + (ys+level+level-1)*outXsize     + xs+level-1]; 
+	northSendLocation = &out[(zs+level-1)*outYsize*outXsize + (ye+level-level-level)*outXsize + xs+level-1]; 
 
 	MPI_Irecv(southRecvLocation,  1, halo32, neighbor[2][3], tag_s, DECOMP_2D_COMM_CART_Z, &requests[0]);
 	MPI_Irecv(northRecvLocation,  1, halo32, neighbor[2][2], tag_n, DECOMP_2D_COMM_CART_Z, &requests[1]);
