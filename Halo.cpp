@@ -2,9 +2,9 @@
 
 void C2Decomp::updateHalo(double *in, double *&out, int level, int ipencil){
 
-    int xs, ys, zs, xe, ye, ze;
+    int xs = 0, ys = 0, zs = 0, xe = 0, ye = 0, ze = 0;
    
-    int s1, s2, s3;
+    int s1 = 0, s2 = 0, s3 = 0;
 
     int icount, ilength, ijump;
 
@@ -67,7 +67,7 @@ void C2Decomp::updateHalo(double *in, double *&out, int level, int ipencil){
 	for(int jp = 0; jp < s2; jp++){	
 	    for(int ip = 0; ip < s1; ip++){
 		int in_ii  = kp*s2*s1 + jp*s1 + ip;
-		int out_ii;
+		int out_ii = 0;
 
 		//Get the output array index...
 		if(ipencil == 0){

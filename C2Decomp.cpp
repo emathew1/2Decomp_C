@@ -16,10 +16,6 @@ void C2Decomp::decomp2DInit(int pRow, int pCol){
 
 	if(pRow == 0 && pCol == 0){
 	   best2DGrid(nProc, row, col);
-	   row  = 2;
-	   pRow = 2;
-	   col  = 2;
-	   pCol = 2;
 	}else{
 	   if(nProc != pRow*pCol){
 		errorcode = 1;
