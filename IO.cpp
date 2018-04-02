@@ -359,4 +359,28 @@ void C2Decomp::writePlane(int ipencil, double *var, int iplane, int n, string fi
 
 }
 
+void C2Decomp::writeEvery(int ipencil, double *var, int iskip, int jskip, int kskip, string filename, bool from1){
+
+    double *wk, *wk2;
+    MPI_Offset filesize, disp;
+    MPI_File fh;
+    MPI_Datatype data_type, new_type;
+    MPI_Comm newcomm;
+
+    int sizes[3], subsizes[3], starts[3];
+    int key, color; 
+    
+    int xsz[3], ysz[3], zsz[3];
+    int xst[3], yst[3], zst[3];
+    int xen[3], yen[3], zen[3];
+    int skip[3];
+
+    data_type = MPI_DOUBLE;
+    
+    skip[0] = iskip;
+    skip[1] = jskip;
+    skip[2] = kskip;
+
+}
+
 

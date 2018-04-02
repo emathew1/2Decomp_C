@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
     }
  
     int nx = 10, ny = 10, nz = 10;
-    int pRow = 2, pCol = 2;
+    int pRow = 0, pCol = 0;
     bool periodicBC[3] = {false, false, false};
 
 if(!mpiRank) cout << "initializing " << endl;
@@ -88,19 +88,22 @@ if(!mpiRank) cout << "done initializing " << endl;
     if(mpiRank == 0){
 	printf( "X2Y Elapsed time is %f\n", t2 - t1 );
     }
-/*
-    if(mpiRank==0){
-      //Testing transposition
-      for(int kp = 0; kp < ySize[2]; kp++){
-	  for(int jp = 0; jp < ySize[1]; jp++){
-	      for(int ip = 0; ip < ySize[0]; ip++){
-	  	  int ii = kp*ySize[1]*ySize[0] + jp*ySize[0] + ip;
-		  cout << u2[ii] << " " << data1[c2d->yStart[2]+kp][c2d->yStart[1]+jp][c2d->yStart[0]+ip] << endl;
-	      }
- 	  }
-       }
+
+    //Testing transposition
+    for(int kp = 0; kp < ySize[2]; kp++){
+	for(int jp = 0; jp < ySize[1]; jp++){
+	    for(int ip = 0; ip < ySize[0]; ip++){
+	  	int ii = kp*ySize[1]*ySize[0] + jp*ySize[0] + ip;
+		double temp = u2[ii];
+		double temp1= data1[c2d->yStart[2]+kp][c2d->yStart[1]+jp][c2d->yStart[0]+ip];  
+		if(fabs(temp-temp1)>1E-16){
+		    cout << "Error in blocking X2Y tranposition" << endl;
+		}
+	    }
+	}
     }
-*/
+
+
     t1 = MPI_Wtime();
     c2d->transposeY2Z(u2, u3);
     t2 = MPI_Wtime();
@@ -108,19 +111,22 @@ if(!mpiRank) cout << "done initializing " << endl;
 	printf( "Y2Z Elapsed time is %f\n", t2 - t1 );
     }
 
-/*
-    if(mpiRank==0){
+
     //Testing transposition
-      for(int kp = 0; kp < zSize[2]; kp++){
-	  for(int jp = 0; jp < zSize[1]; jp++){
+    for(int kp = 0; kp < zSize[2]; kp++){
+	for(int jp = 0; jp < zSize[1]; jp++){
 	    for(int ip = 0; ip < zSize[0]; ip++){
 		int ii = kp*zSize[1]*zSize[0] + jp*zSize[0] + ip;
-		cout << u3[ii] << " " << data1[c2d->zStart[2]+kp][c2d->zStart[1]+jp][c2d->zStart[0]+ip] << endl;
+		double temp = u3[ii];
+		double temp1= data1[c2d->zStart[2]+kp][c2d->zStart[1]+jp][c2d->zStart[0]+ip]; 
+		if(fabs(temp-temp1)>1E-16){
+		    cout << "Error in blocking Y2Z tranposition" << endl;
+		}
  	    }
   	}
-      }
     }
-*/
+    
+
     t1 = MPI_Wtime();
     c2d->transposeZ2Y(u3, u2);
     t2 = MPI_Wtime();
@@ -128,19 +134,22 @@ if(!mpiRank) cout << "done initializing " << endl;
 	printf( "Z2Y Elapsed time is %f\n", t2 - t1 );
     }
 
-/*
-    if(mpiRank==0){
-      //Testing transposition
-      for(int kp = 0; kp < ySize[2]; kp++){
-	  for(int jp = 0; jp < ySize[1]; jp++){
-	      for(int ip = 0; ip < ySize[0]; ip++){
-	  	  int ii = kp*ySize[1]*ySize[0] + jp*ySize[0] + ip;
-		  cout << u2[ii] << " " << data1[c2d->yStart[2]+kp][c2d->yStart[1]+jp][c2d->yStart[0]+ip] << endl;
-	      }
- 	  }
-       }
+
+    //Testing transposition
+    for(int kp = 0; kp < ySize[2]; kp++){
+	for(int jp = 0; jp < ySize[1]; jp++){
+	    for(int ip = 0; ip < ySize[0]; ip++){
+	  	int ii = kp*ySize[1]*ySize[0] + jp*ySize[0] + ip;
+		double temp = u2[ii];
+		double temp1= data1[c2d->yStart[2]+kp][c2d->yStart[1]+jp][c2d->yStart[0]+ip]; 
+		if(fabs(temp-temp1)>1E-16){
+		    cout << "Error in blocking Z2Y tranposition" << endl;
+		}
+	    }
+ 	}
     }
-*/
+
+
     t1 = MPI_Wtime();
     c2d->transposeY2X(u2, u1);
     t2 = MPI_Wtime();
@@ -148,19 +157,21 @@ if(!mpiRank) cout << "done initializing " << endl;
 	printf( "Y2X Elapsed time is %f\n", t2 - t1 );
     }
 
-/*
     if(mpiRank==0){
       //Testing transposition
       for(int kp = 0; kp < xSize[2]; kp++){
 	  for(int jp = 0; jp < xSize[1]; jp++){
 	      for(int ip = 0; ip < xSize[0]; ip++){
 	  	  int ii = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
-		  cout << u1[ii] << " " << data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip] << endl;
+		  double temp = u1[ii];
+		  double temp1= data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip]; 
+		  if(fabs(temp-temp1)>1E-16){
+		      cout << "Error in blocking Y2X transposition" << endl;
+		  }
 	      }
  	  }
        }
     }
-*/
 
     //allocate new buffers for non-blocking comms
     double *sbuf = new double[c2d->decompBufSize];
@@ -179,19 +190,19 @@ if(!mpiRank) cout << "done initializing " << endl;
     }
 
 
-/*
-    if(mpiRank==3){
-      //Testing transposition
-      for(int kp = 0; kp < ySize[2]; kp++){
-	  for(int jp = 0; jp < ySize[1]; jp++){
-	      for(int ip = 0; ip < ySize[0]; ip++){
-	  	  int ii = kp*ySize[1]*ySize[0] + jp*ySize[0] + ip;
-		  cout << u2[ii] << " " << data1[c2d->yStart[2]+kp][c2d->yStart[1]+jp][c2d->yStart[0]+ip] << endl;
-	      }
- 	  }
-       }
+    //Testing transposition
+    for(int kp = 0; kp < ySize[2]; kp++){
+	for(int jp = 0; jp < ySize[1]; jp++){
+	    for(int ip = 0; ip < ySize[0]; ip++){
+	  	int ii = kp*ySize[1]*ySize[0] + jp*ySize[0] + ip;
+		double temp = u2[ii];
+		double temp1= data1[c2d->yStart[2]+kp][c2d->yStart[1]+jp][c2d->yStart[0]+ip]; 
+		if(fabs(temp-temp1)>1E-16){
+		    cout << "Error in nonblocking X2Y transposition" << endl;
+		}
+	    }
+        }
     }
-*/
 
     MPI_Request y2zHandle;
     t1 = MPI_Wtime();
@@ -268,13 +279,77 @@ if(!mpiRank) cout << "done initializing " << endl;
     }
 */
 
+    double *u4;
+    c2d->allocX(u4);
+
     c2d->writeOne(0, u1, "test.out");
+    MPI_Barrier(MPI_COMM_WORLD);
+    c2d->readOne(0, u4, "test.out");
+
+     if(mpiRank==2){
+      //Testing transposition
+      for(int kp = 0; kp < xSize[2]; kp++){
+	  for(int jp = 0; jp < xSize[1]; jp++){
+	      for(int ip = 0; ip < xSize[0]; ip++){
+	  	  int ii = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
+		  cout << u1[ii] << " " << u4[ii] << " " << data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip] << endl;
+	      }
+ 	  }
+       }
+    }
+   
+
+
+    //Write out to large file
+    MPI_File fh;
+    MPI_Offset disp, filesize;
+
+    string filename = "vartest.out";
+    MPI_File_open(MPI_COMM_WORLD, filename.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
+
+    filesize = 0;
+    MPI_File_set_size(fh, filesize);
+
+    disp = 0;
+
+    c2d->writeVar(fh, disp, 0, u1);
+    c2d->writeVar(fh, disp, 1, u2);
+    c2d->writeVar(fh, disp, 2, u3);
+    c2d->writeVar(fh, disp, 0, u4);
+    
+    MPI_File_close(&fh);
+
+    //Now lets read in that data back in
+    double *u1a, *u2a, *u3a, *u4a;
+
+    c2d->allocX(u1a);
+    c2d->allocY(u2a);
+    c2d->allocZ(u3a);
+    c2d->allocX(u4a);
+
+    MPI_File_open(MPI_COMM_WORLD, filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+    disp = 0;    
+
+    c2d->readVar(fh, disp, 0, u1a);
+    c2d->readVar(fh, disp, 1, u2a);
+    c2d->readVar(fh, disp, 2, u3a);
+    c2d->readVar(fh, disp, 0, u4a);
+
+    MPI_File_close(&fh);
+
 
     delete[] sbuf;
     delete[] rbuf;
     c2d->deallocXYZ(u1);
+    c2d->deallocXYZ(u1a);
     c2d->deallocXYZ(u2);
+    c2d->deallocXYZ(u2a);
     c2d->deallocXYZ(u3);
+    c2d->deallocXYZ(u3a);
+    c2d->deallocXYZ(u4);
+    c2d->deallocXYZ(u4a);
+
+    
 
     //Now lets kill MPI
     MPI_Finalize();

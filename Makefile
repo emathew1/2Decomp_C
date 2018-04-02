@@ -1,7 +1,7 @@
 
 include Makefile.in
 
-OBJECTS  = test.o C2Decomp.o Alloc.o TransposeX2Y.o TransposeY2Z.o TransposeZ2Y.o TransposeY2X.o MemSplitMerge.cpp IO.o
+OBJECTS  = test.o C2Decomp.o Alloc.o TransposeX2Y.o TransposeY2Z.o TransposeZ2Y.o TransposeY2X.o MemSplitMerge.cpp IO.o Best2DGrid.o
 
 all: TEST
 
@@ -27,6 +27,9 @@ MemSplitMerge.o: MemSplitMerge.cpp C2Decomp.hpp
 	$(CC) $(CFLAGS) -c $< 
 
 IO.o: IO.cpp C2Decomp.hpp  
+	$(CC) $(CFLAGS) -c $< 
+
+Best2DGrid.o: Best2DGrid.cpp C2Decomp.hpp  
 	$(CC) $(CFLAGS) -c $< 
 
 C2Decomp.o: C2Decomp.cpp C2Decomp.hpp

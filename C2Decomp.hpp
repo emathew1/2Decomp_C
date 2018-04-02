@@ -103,6 +103,9 @@ class C2Decomp{
 
 	void decomp2DInit(int pRow, int pCol);
 
+	void best2DGrid(int nProc, int &pRow, int &pCol);
+	void FindFactor(int num, int *factors, int &nfact);
+
 	void decomp2DFinalize();
 
 	//Just get it running without the optional decomp for now...
@@ -159,7 +162,7 @@ class C2Decomp{
 	void writeVar(MPI_File &fh, MPI_Offset &disp, int ipencil, double *var);
 	void writeScalar(MPI_File &fh, MPI_Offset &disp, int n, double *var);
 	void writePlane(int ipencil, double *var, int iplane, int n, string filename);
-	void writeEvery(int ipencil, double *var, int iskip, int jskip, int kskip, string filename, int from1);
+	void writeEvery(int ipencil, double *var, int iskip, int jskip, int kskip, string filename, bool from1);
 	
 	void readOne(int ipencil, double *var, string filename);
 	void readVar(MPI_File &fh, MPI_Offset &disp, int ipencil, double *var);
