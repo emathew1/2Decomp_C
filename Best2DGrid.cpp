@@ -88,7 +88,7 @@ void C2Decomp::best2DGrid(int iproc, int &best_pRow, int &best_pCol){
     	    allocZ(u3); 
 
 	    t1 = MPI_Wtime();
-	    for(int numTransTest = 0; numTransTest < 5; numTransTest++){
+	    for(int numTransTest = 0; numTransTest < 50; numTransTest++){
 	        transposeX2Y(u1, u2);
 	        transposeY2Z(u2, u3);
 	        transposeZ2Y(u3, u2);

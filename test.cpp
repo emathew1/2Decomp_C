@@ -32,16 +32,17 @@ int main(int argc, char *argv[]){
 
     }
  
-    int nx = 10, ny = 10, nz = 10;
+    int nx = 20, ny = 15, nz = 10;
     int pRow = 0, pCol = 0;
     bool periodicBC[3] = {true, true, true};
 
-if(!mpiRank) cout << "initializing " << endl;
+    if(!mpiRank) cout << "initializing " << endl;
     C2Decomp *c2d;
     c2d = new C2Decomp(nx, ny, nz, pRow, pCol, periodicBC);
-
-if(!mpiRank) cout << "done initializing " << endl;
+    if(!mpiRank) cout << "done initializing " << endl;
     
+    bool errorFlag, errorFlagGlobal;
+
     int m = 1;
     double data1[nz][ny][nx];
     for(int kp = 0; kp < nz; kp++){
@@ -90,6 +91,9 @@ if(!mpiRank) cout << "done initializing " << endl;
     }
 
     //Testing transposition
+
+    errorFlag = false;
+    errorFlagGlobal = false;
     for(int kp = 0; kp < ySize[2]; kp++){
 	for(int jp = 0; jp < ySize[1]; jp++){
 	    for(int ip = 0; ip < ySize[0]; ip++){

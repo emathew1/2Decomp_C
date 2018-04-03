@@ -40,8 +40,8 @@ int main(int argc, char *argv[]){
 
     }
  
-    int nx = 10, ny = 10, nz = 10;
-    int pRow = 2, pCol = 2;
+    int nx = 100,  ny = 10, nz = 10;
+    int pRow = 1, pCol = 4;
     bool periodicBC[3] = {true, true, true};
 
     if(!mpiRank) cout << "initializing " << endl;
@@ -54,13 +54,15 @@ int main(int argc, char *argv[]){
     int zSize[3] = {c2d->zSize[0], c2d->zSize[1], c2d->zSize[2]};
 
     
-    double *u1, *u2, *u3;
-    double *v1, *v2, *v3;
-    double *w1, *w2, *w3;
+    double *u1=NULL, *u2=NULL, *u3=NULL;
+    double *v1=NULL, *v2=NULL, *v3=NULL;
+    double *w1=NULL, *w2=NULL, *w3=NULL;
 
-    double *wk2, *wk3;
-    double *uh, *vh, *wh;
-    double *div1, *div2, *div3, *div4;
+    double *wk2=NULL, *wk3=NULL;
+    double *uh1=NULL, *vh1=NULL, *wh1=NULL;
+    double *uh2=NULL, *vh2=NULL, *wh2=NULL;
+    double *uh3=NULL, *vh3=NULL, *wh3=NULL;
+    double *div1=NULL, *div2=NULL, *div3=NULL, *div4=NULL;
 
     c2d->allocX(u1);
     c2d->allocX(v1);
@@ -173,7 +175,7 @@ int main(int argc, char *argv[]){
 
     int numLevel = 1;
     int ipencil  = 0;
-    c2d->updateHalo(v1, vh, numLevel, ipencil); 
+    c2d->updateHalo(v1, vh1, numLevel, ipencil); 
 
     for(int kp = 0; kp < xSize[2]; kp++){
 	for(int jp = 0; jp < xSize[1]; jp++){
@@ -183,12 +185,12 @@ int main(int argc, char *argv[]){
 		//some macros or functions to retrieve this information for a given pencil would be nice...
 		int iihp1 = (kp+numLevel)*(xSize[1]+2*numLevel)*xSize[0] + (jp+numLevel+1)*xSize[0] + ip;
 		int iihm1 = (kp+numLevel)*(xSize[1]+2*numLevel)*xSize[0] + (jp+numLevel-1)*xSize[0] + ip;
-		div2[ii] += vh[iihp1]-vh[iihm1];
+		div2[ii] += vh1[iihp1]-vh1[iihm1];
 	    }
 	}
     }
 
-    c2d->updateHalo(w1, wh, numLevel, ipencil); 
+    c2d->updateHalo(w1, wh1, numLevel, ipencil); 
 
     for(int kp = 0; kp < xSize[2]; kp++){
 	for(int jp = 0; jp < xSize[1]; jp++){
@@ -198,29 +200,40 @@ int main(int argc, char *argv[]){
 		//some macros or functions to retrieve this information for a given pencil would be nice...
 		int iihp1 = (kp+numLevel+1)*(xSize[1]+2*numLevel)*xSize[0] + (jp+numLevel)*xSize[0] + ip;
 		int iihm1 = (kp+numLevel-1)*(xSize[1]+2*numLevel)*xSize[0] + (jp+numLevel)*xSize[0] + ip;
-		div2[ii] += wh[iihp1]-wh[iihm1];
+		div2[ii] += wh1[iihp1]-wh1[iihm1];
 	    }
 	}
     }
 
-
-    if(mpiRank == 2){
-	for(int kp = 1; kp < xSize[2]-1; kp++){
-	    for(int jp = 1; jp < xSize[1]-1; jp++){
-	        for(int ip = 1; ip < xSize[0]-1; ip++){
-		    int ii    = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
-
-		    cout << div1[ii] << " " << div2[ii] << endl;
-	        }
+    bool errorFlag = false;
+    bool errorFlagGlobal =false;
+    for(int kp = 1; kp < xSize[2]-1; kp++){
+	for(int jp = 1; jp < xSize[1]-1; jp++){
+	    for(int ip = 1; ip < xSize[0]-1; ip++){
+		int ii    = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
+		if(fabs(div1[ii] - div2[ii]) > 1E-16){
+		    errorFlag = true;
+		}
 	    }
+	    
 	}
-
     }
 
-    c2d->deallocXYZ(vh);
-    c2d->deallocXYZ(wh);
-    vh = NULL; 
-    wh = NULL;
+    MPI_Allreduce(&errorFlag, &errorFlagGlobal, 1, MPI_C_BOOL, MPI_LOR, MPI_COMM_WORLD);
+
+    if(!mpiRank){
+        if(errorFlagGlobal){
+	    cout << "Error! Looks like a problem in x-pencil halo!" << endl;
+        }else{
+	    cout << "Halo support for x-pencil looks good!" << endl;
+	}
+    }
+
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    c2d->deallocXYZ(vh1);
+    c2d->deallocXYZ(wh1);
 
     if(!mpiRank) cout << "Calculating Divergence using halo's in ypencil" << endl;
 
@@ -230,7 +243,7 @@ int main(int argc, char *argv[]){
 
     numLevel = 1;
     ipencil  = 1;
-    c2d->updateHalo(u2, uh, numLevel, ipencil);
+    c2d->updateHalo(u2, uh2, numLevel, ipencil);
 
     for(int kp = 0; kp < ySize[2]; kp++){
 	for(int jp = 1; jp < ySize[1]-1; jp++){
@@ -239,7 +252,7 @@ int main(int argc, char *argv[]){
 
 		int iihp1 = (kp+numLevel)*ySize[1]*(ySize[0]+2*numLevel) + jp*(ySize[0]+2*numLevel) + ip + numLevel + 1;
 		int iihm1 = (kp+numLevel)*ySize[1]*(ySize[0]+2*numLevel) + jp*(ySize[0]+2*numLevel) + ip + numLevel - 1;
-		wk2[ii] = uh[iihp1]-uh[iihm1];
+		wk2[ii] = uh2[iihp1]-uh2[iihm1];
 	    }
 	}
     }
@@ -258,7 +271,7 @@ int main(int argc, char *argv[]){
 
     numLevel = 1;
     ipencil  = 1;
-    c2d->updateHalo(w2, wh, numLevel, ipencil);
+    c2d->updateHalo(w2, wh2, numLevel, ipencil);
 
 
     for(int kp = 0; kp < ySize[2]; kp++){
@@ -268,25 +281,126 @@ int main(int argc, char *argv[]){
 
 		int iihp1 = (kp+numLevel+1)*ySize[1]*(ySize[0]+2*numLevel) + jp*(ySize[0]+2*numLevel) + ip + numLevel;
 		int iihm1 = (kp+numLevel-1)*ySize[1]*(ySize[0]+2*numLevel) + jp*(ySize[0]+2*numLevel) + ip + numLevel;
-		wk2[ii] += wh[iihp1]-wh[iihm1];
+		wk2[ii] += wh2[iihp1]-wh2[iihm1];
 	    }
 	}
     }
 
     c2d->transposeY2X(wk2, div3);
 
-    if(mpiRank == 2){
-	for(int kp = 1; kp < xSize[2]-1; kp++){
-	    for(int jp = 1; jp < xSize[1]-1; jp++){
-	        for(int ip = 1; ip < xSize[0]-1; ip++){
-		    int ii    = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
 
-		    cout << div1[ii] << " " << div2[ii]  << div3[ii] << endl;
-	        }
+    errorFlag = false;
+    errorFlagGlobal = false;
+    for(int kp = 1; kp < xSize[2]-1; kp++){
+	for(int jp = 1; jp < xSize[1]-1; jp++){
+	    for(int ip = 1; ip < xSize[0]-1; ip++){
+		int ii    = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
+		if(fabs(div1[ii] - div3[ii]) > 1E-16){
+		    errorFlag = true;
+		}
+	    }
+	    
+	}
+    }
+
+    MPI_Allreduce(&errorFlag, &errorFlagGlobal, 1, MPI_C_BOOL, MPI_LOR, MPI_COMM_WORLD);
+
+    if(!mpiRank){
+        if(errorFlagGlobal){
+	    cout << "Error! Looks like a problem in y-pencil halo!" << endl;
+        }else{
+	    cout << "Halo support for y-pencil looks good!" << endl;
+	}
+    }
+
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    c2d->deallocXYZ(uh2); 
+    c2d->deallocXYZ(wh2); 
+
+    if(!mpiRank) cout << "Calculating Divergence using halo's in zpencil" << endl;
+
+    c2d->transposeY2Z(u2, u3); 
+    c2d->transposeY2Z(v2, v3); 
+    c2d->transposeY2Z(w2, w3);
+
+    numLevel = 1;
+    ipencil  = 2;
+    c2d->updateHalo(u3, uh3, numLevel, ipencil);
+
+    for(int kp = 1; kp < zSize[2]-1; kp++){
+	for(int jp = 0; jp < zSize[1]; jp++){
+	    for(int ip = 0; ip < zSize[0]; ip++){
+		int ii   = kp*zSize[1]*zSize[0]     + jp*zSize[0] + ip;
+
+		int iihp1 = (kp)*(zSize[1]+2*numLevel)*(zSize[0]+2*numLevel) + (jp+numLevel)*(zSize[0]+2*numLevel) + ip+numLevel+1;
+		int iihm1 = (kp)*(zSize[1]+2*numLevel)*(zSize[0]+2*numLevel) + (jp+numLevel)*(zSize[0]+2*numLevel) + ip+numLevel-1;
+		wk3[ii] = uh3[iihp1]-uh3[iihm1];
 	    }
 	}
-
     }
+
+    numLevel = 1;
+    ipencil  = 2;
+    c2d->updateHalo(v3, vh3, numLevel, ipencil);
+
+    for(int kp = 1; kp < zSize[2]-1; kp++){
+	for(int jp = 0; jp < zSize[1]; jp++){
+	    for(int ip = 0; ip < zSize[0]; ip++){
+		int ii   = kp*zSize[1]*zSize[0]     + jp*zSize[0] + ip;
+
+		int iihp1 = (kp)*(zSize[1]+2*numLevel)*(zSize[0]+2*numLevel) + (jp+numLevel+1)*(zSize[0]+2*numLevel) + ip+numLevel;
+		int iihm1 = (kp)*(zSize[1]+2*numLevel)*(zSize[0]+2*numLevel) + (jp+numLevel-1)*(zSize[0]+2*numLevel) + ip+numLevel;
+		wk3[ii] += vh3[iihp1]-vh3[iihm1];
+	    }
+	}
+    }
+
+    for(int kp = 1; kp < zSize[2]-1; kp++){
+	for(int jp = 0; jp < zSize[1]; jp++){
+	    for(int ip = 0; ip < zSize[0]; ip++){
+		int ii   = kp*zSize[1]*zSize[0]     + jp*zSize[0] + ip;
+		int iip1 = (kp+1)*zSize[1]*zSize[0] + jp*zSize[0] + ip;
+		int iim1 = (kp-1)*zSize[1]*zSize[0] + jp*zSize[0] + ip;
+
+		wk3[ii] += w3[iip1]-w3[iim1];
+	    }
+	}
+    }
+
+    c2d->transposeZ2Y(wk3, wk2);
+    c2d->transposeY2X(wk2, div4);
+
+    errorFlag = false;
+    errorFlagGlobal = false;
+    for(int kp = 1; kp < xSize[2]-1; kp++){
+	for(int jp = 1; jp < xSize[1]-1; jp++){
+	    for(int ip = 1; ip < xSize[0]-1; ip++){
+		int ii    = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
+		if(fabs(div1[ii] - div4[ii]) > 1E-16){
+		    errorFlag = true;
+		}
+	    }
+	    
+	}
+    }
+
+    MPI_Allreduce(&errorFlag, &errorFlagGlobal, 1, MPI_C_BOOL, MPI_LOR, MPI_COMM_WORLD);
+
+    if(!mpiRank){
+        if(errorFlagGlobal){
+	    cout << "Error! Looks like a problem in z-pencil halo!" << endl;
+        }else{
+	    cout << "Halo support for z-pencil looks good!" << endl;
+	}
+    }
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    c2d->deallocXYZ(uh3);
+    c2d->deallocXYZ(vh3);
+
 
     //Clean up our allocated memory...
     c2d->deallocXYZ(u1);
@@ -308,6 +422,8 @@ int main(int argc, char *argv[]){
 
     //Now lets kill MPI
     MPI_Finalize();
+
+
 
     return 0;
 }
