@@ -40,8 +40,8 @@ int main(int argc, char *argv[]){
 
     }
  
-    int nx = 100,  ny = 10, nz = 10;
-    int pRow = 1, pCol = 4;
+    int nx = 100,  ny = 150, nz = 131;
+    int pRow = 0, pCol = 0;
     bool periodicBC[3] = {true, true, true};
 
     if(!mpiRank) cout << "initializing " << endl;
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]){
 	    }
 	}
     }
-
+    
     //Move the things we need to the z-pencil
     c2d->transposeX2Y(w1, w2);
     c2d->transposeY2Z(w2, w3);
@@ -240,10 +240,12 @@ int main(int argc, char *argv[]){
     c2d->transposeX2Y(u1, u2);
     c2d->transposeX2Y(v1, v2);
     c2d->transposeX2Y(w1, w2);   
+    
 
     numLevel = 1;
     ipencil  = 1;
     c2d->updateHalo(u2, uh2, numLevel, ipencil);
+    MPI_Barrier(MPI_COMM_WORLD);
 
     for(int kp = 0; kp < ySize[2]; kp++){
 	for(int jp = 1; jp < ySize[1]-1; jp++){
@@ -400,7 +402,7 @@ int main(int argc, char *argv[]){
 
     c2d->deallocXYZ(uh3);
     c2d->deallocXYZ(vh3);
-
+ 
 
     //Clean up our allocated memory...
     c2d->deallocXYZ(u1);
