@@ -113,6 +113,13 @@ class C2Decomp{
 	void transposeY2Z(double *src, double *dst);
 	void transposeZ2Y(double *src, double *dst);
 	void transposeY2X(double *src, double *dst);
+
+	//Get Transposes but with array indexing with the major index of the pencil...
+	void transposeX2Y_MajorIndex(double *src, double *dst);
+	void transposeY2Z_MajorIndex(double *src, double *dst);
+	void transposeZ2Y_MajorIndex(double *src, double *dst);
+	void transposeY2X_MajorIndex(double *src, double *dst);
+	
 	
 	//calls for overlapping communication and computation...
 	void transposeX2Y_Start(MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
@@ -126,6 +133,20 @@ class C2Decomp{
 	
 	void transposeY2X_Start(MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
 	void transposeY2X_Wait (MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
+
+	//calls for overlapping communication and computation...
+	void transposeX2Y_MajorIndex_Start(MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeX2Y_MajorIndex_Wait (MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
+
+	void transposeY2Z_MajorIndex_Start(MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeY2Z_MajorIndex_Wait (MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
+
+	void transposeZ2Y_MajorIndex_Start(MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeZ2Y_MajorIndex_Wait (MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
+	
+	void transposeY2X_MajorIndex_Start(MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
+	void transposeY2X_MajorIndex_Wait (MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
+	
 	
 	void decompInfoInit();
 	void decompInfoFinalize();
@@ -149,6 +170,7 @@ class C2Decomp{
 	void getDecompInfo(DecompInfo dcompinfo_in);
 	
 	void memSplitXY(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+
 	void memMergeXY(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
 	void memMergeXY_YMajor(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
 
@@ -156,9 +178,17 @@ class C2Decomp{
 	void memSplitYZ_YMajor(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
 
 	void memMergeYZ(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	void memMergeYZ_ZMajor(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+
 	void memSplitZY(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	void memSplitZY_ZMajor(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+
 	void memMergeZY(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	void memMergeZY_YMajor(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+
 	void memSplitYX(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	void memSplitYX_YMajor(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+
 	void memMergeYX(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
 	
   	//IO

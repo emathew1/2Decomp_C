@@ -2,9 +2,10 @@
 include Makefile.in
 
 TEST_OBJECTS  = test.o C2Decomp.o Alloc.o TransposeX2Y.o TransposeY2Z.o TransposeZ2Y.o TransposeY2X.o MemSplitMerge.cpp IO.o Best2DGrid.o Halo.o
+TESTMAJORINDEXING_OBJECTS  = test_majorindexing.o C2Decomp.o Alloc.o TransposeX2Y.o TransposeY2Z.o TransposeZ2Y.o TransposeY2X.o MemSplitMerge.cpp IO.o Best2DGrid.o Halo.o
 HALOTEST_OBJECTS  = halo_test.o C2Decomp.o Alloc.o TransposeX2Y.o TransposeY2Z.o TransposeZ2Y.o TransposeY2X.o MemSplitMerge.cpp IO.o Best2DGrid.o Halo.o
 
-all: TEST HALO_TEST
+all: TEST TEST_MAJORINDEXING HALO_TEST
 
 TransposeX2Y.o: TransposeX2Y.cpp C2Decomp.hpp  
 	$(CC) $(CFLAGS) -c $< 
@@ -44,6 +45,9 @@ halo_test.o: halo_test.cpp C2Decomp.hpp
 
 TEST:  $(TEST_OBJECTS)
 	$(CC) $(CFLAGS) $(TEST_OBJECTS) -o $@ $(LIBF) 
+
+TEST_MAJORINDEXING:  $(TESTMAJORINDEXING_OBJECTS)
+	$(CC) $(CFLAGS) $(TESTMAJORINDEXING_OBJECTS) -o $@ $(LIBF) 
 
 HALO_TEST:  $(HALOTEST_OBJECTS)
 	$(CC) $(CFLAGS) $(HALOTEST_OBJECTS) -o $@ $(LIBF) 
