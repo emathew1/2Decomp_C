@@ -19,6 +19,7 @@ void C2Decomp::transposeX2Y(double *src, double *dst){
 		  DECOMP_2D_COMM_COL);
 
     memMergeXY(work2_r, d1, d2, d3, dst, dims[0], decompMain.y1dist);
+    //memMergeXY_YMajor(work2_r, d1, d2, d3, dst, dims[0], decompMain.y1dist);
 
 }
 

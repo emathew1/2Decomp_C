@@ -150,7 +150,11 @@ class C2Decomp{
 	
 	void memSplitXY(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
 	void memMergeXY(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	void memMergeXY_YMajor(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+
 	void memSplitYZ(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+	void memSplitYZ_YMajor(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
+
 	void memMergeYZ(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
 	void memSplitZY(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
 	void memMergeZY(double *in, int n1, int n2, int n3, double *out, int iproc, int *dist);
